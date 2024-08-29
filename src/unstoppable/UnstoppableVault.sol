@@ -79,10 +79,12 @@ contract UnstoppableVault is IERC3156FlashLender, ReentrancyGuard, Owned, ERC462
         external
         returns (bool)
     {
-        if (amount == 0) revert InvalidAmount(0); // fail early
-        if (address(asset) != _token) revert UnsupportedCurrency(); // enforce ERC3156 requirement
+        if (amount == 0) revert InvalidAmount(0); // fail early @audit-ok impossible to alter this
+        if (address(asset) != _token) revert UnsupportedCurrency(); // enforce ERC3156 requirement @audit-ok asset is immutable impossible to alter
         uint256 balanceBefore = totalAssets();
-        if (convertToShares(totalSupply) != balanceBefore) revert InvalidBalance(); // enforce ERC4626 requirement
+
+        //convertToShares round down to zero, so it can be != than balancebefore when division needed
+        if (convertToShares(totalSupply) != balanceBefore) revert InvalidBalance(); // enforce ERC4626 requirement @audit can we fuck up this accounting?
 
         // transfer tokens out + execute callback on receiver
         ERC20(_token).safeTransfer(address(receiver), amount);

